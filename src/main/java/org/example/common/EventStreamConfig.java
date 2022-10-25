@@ -102,7 +102,7 @@ class EventStreamConfig {
                 .durable("partition-1")
                 .stream()
                 .withArgument("x-max-age", "7D")
-                .withArgument("x-stream-max-segment-size-bytes", DataSize
+                .withArgument("x-max-length-bytes", DataSize
                         .ofGigabytes(10).toBytes())
                 .build();
     }
