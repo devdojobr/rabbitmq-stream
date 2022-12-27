@@ -19,9 +19,10 @@ import org.springframework.rabbit.stream.producer.RabbitStreamTemplate;
 import org.springframework.rabbit.stream.retry.StreamRetryOperationsInterceptorFactoryBean;
 import org.springframework.retry.support.RetryTemplate;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.IntStream;
+
+import static java.util.concurrent.CompletableFuture.delayedExecutor;
 
 @Slf4j
 @Configuration
@@ -48,11 +49,7 @@ class EventStreamConfig {
 
     @Bean
     SuperStream devDojoSuperStream() {
-        return new SuperStream(
-                "devdojo.super",
-                3,
-                (stream, partitions) -> IntStream.range(0, partitions).mapToObj(it -> "same").toList()
-        );
+        return new SuperStream("devdojo.super", 3);
     }
 
     @Bean
@@ -60,7 +57,7 @@ class EventStreamConfig {
                                                      Jackson2JsonMessageConverter jackson2JsonMessageConverter) {
         var template = new RabbitStreamTemplate(env, "devdojo.super");
         template.setMessageConverter(jackson2JsonMessageConverter);
-        template.setSuperStreamRouting(Object::toString);
+        template.setSuperStreamRouting(message -> UUID.randomUUID().toString());
         return template;
     }
 
@@ -72,11 +69,9 @@ class EventStreamConfig {
         container.setupMessageListener(devDojoSuperConsumer);
         container.setConsumerCustomizer(
                 (id, builder) -> builder.offset(OffsetSpecification.first())
-                        .singleActiveConsumer()
                         .autoTrackingStrategy()
         );
-        CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS)
-                .execute(container::start);
+        delayedExecutor(5, TimeUnit.SECONDS).execute(container::start);
         return container;
     }
 
