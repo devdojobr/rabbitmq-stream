@@ -28,6 +28,7 @@ import static java.util.concurrent.CompletableFuture.delayedExecutor;
 @Configuration
 @RequiredArgsConstructor
 class EventStreamConfig {
+    private static final String SUPER_STREAM = "devdojo.super";
     @Value("${spring.application.name}")
     private String applicationName;
 
@@ -49,13 +50,13 @@ class EventStreamConfig {
 
     @Bean
     SuperStream devDojoSuperStream() {
-        return new SuperStream("devdojo.super", 3);
+        return new SuperStream(SUPER_STREAM, 3);
     }
 
     @Bean
     RabbitStreamTemplate devDojoRabbitStreamTemplate(Environment env,
                                                      Jackson2JsonMessageConverter jackson2JsonMessageConverter) {
-        var template = new RabbitStreamTemplate(env, "devdojo.super");
+        var template = new RabbitStreamTemplate(env, SUPER_STREAM);
         template.setMessageConverter(jackson2JsonMessageConverter);
         template.setSuperStreamRouting(message -> UUID.randomUUID().toString());
         return template;
@@ -65,7 +66,7 @@ class EventStreamConfig {
     StreamListenerContainer devDojoContainer(Environment env, MessageListener devDojoSuperConsumer) {
         var container = new StreamListenerContainer(env);
         container.setAutoStartup(false);
-        container.superStream("devdojo.super", applicationName);
+        container.superStream(SUPER_STREAM, applicationName);
         container.setupMessageListener(devDojoSuperConsumer);
         container.setConsumerCustomizer(
                 (id, builder) -> builder.offset(OffsetSpecification.first())
