@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class RequestService {
-    private final RabbitStreamTemplate rabbitStreamTemplate;
+    private final RabbitStreamTemplate devDojoRabbitStreamTemplate;
 
     public void publisher(Request request) {
         log.info("Publisher new request: {}", request);
-        rabbitStreamTemplate.convertAndSend(request);
+        devDojoRabbitStreamTemplate.convertAndSend(request);
     }
 }

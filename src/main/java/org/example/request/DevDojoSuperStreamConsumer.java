@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-class DevDojoSuperConsumer extends StreamListener<Request> {
+class DevDojoSuperStreamConsumer extends StreamListener<Request> {
 
     @Override
     @Retryable(interceptor = "streamRetryOperationsInterceptorFactoryBean")

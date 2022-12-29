@@ -1,0 +1,8 @@
+package org.example.common;
+
+import org.springframework.rabbit.stream.listener.StreamListenerContainer;
+
+import java.util.function.BiFunction;
+
+public interface StreamListenerContainerSimpleFactory<T> extends BiFunction<String, StreamListener<T>, StreamListenerContainer> {
+}
