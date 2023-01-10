@@ -56,6 +56,7 @@ class StreamCommonConfig {
             @Override
             public void onStreamMessage(Message message, MessageHandler.Context context) {
                 streamListener.onMessage(
+                        message,
                         objectMapperSupplier.sneakyThrows(
                                 objectMapper -> objectMapper.readValue(message.getBodyAsBinary(), streamListener)
                         ),

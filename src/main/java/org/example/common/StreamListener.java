@@ -1,6 +1,7 @@
 package org.example.common;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.rabbitmq.stream.Message;
 import com.rabbitmq.stream.MessageHandler;
 
 public abstract class StreamListener<T> extends TypeReference<T> {
@@ -10,5 +11,9 @@ public abstract class StreamListener<T> extends TypeReference<T> {
 
     public void onMessage(T payload, MessageHandler.Context context) {
         onMessage(payload);
+    }
+
+    public void onMessage(Message message, T payload, MessageHandler.Context context) {
+        onMessage(payload, context);
     }
 }
