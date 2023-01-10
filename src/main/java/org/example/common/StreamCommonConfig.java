@@ -1,8 +1,6 @@
 package org.example.common;
 
 import com.rabbitmq.stream.Environment;
-import com.rabbitmq.stream.Message;
-import com.rabbitmq.stream.MessageHandler;
 import com.rabbitmq.stream.OffsetSpecification;
 import com.rabbitmq.stream.impl.StreamEnvironmentBuilder;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -13,7 +11,6 @@ import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.rabbit.stream.listener.StreamListenerContainer;
-import org.springframework.rabbit.stream.listener.StreamMessageListener;
 import org.springframework.rabbit.stream.producer.RabbitStreamTemplate;
 import org.springframework.rabbit.stream.retry.StreamRetryOperationsInterceptorFactoryBean;
 import org.springframework.retry.support.RetryTemplate;
@@ -46,24 +43,7 @@ class StreamCommonConfig {
 
     @Bean
     <T> StreamListenerMessageConverter<T> streamListenerMessageConverter(ObjectMapperSupplier<T> objectMapperSupplier) {
-        return streamListener -> new StreamMessageListener() {
-
-            @Override
-            public void onMessage(org.springframework.amqp.core.Message message) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public void onStreamMessage(Message message, MessageHandler.Context context) {
-                streamListener.onMessage(
-                        message,
-                        objectMapperSupplier.sneakyThrows(
-                                objectMapper -> objectMapper.readValue(message.getBodyAsBinary(), streamListener)
-                        ),
-                        context
-                );
-            }
-        };
+        return streamListener -> new SimpleStreamMessageListener<>(streamListener, objectMapperSupplier);
     }
 
     @Bean
